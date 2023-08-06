@@ -9,11 +9,19 @@ const apiRoutes         = require('./routes/api.js');
 const fccTestingRoutes  = require('./routes/fcctesting.js');
 const runner            = require('./test-runner');
 
+const mongoose = require("mongoose");
 const app = express();
 
+process.env.NODE_ENV = 'test';
 app.use('/public', express.static(process.cwd() + '/public'));
 
 app.use(cors({origin: '*'})); //USED FOR FCC TESTING PURPOSES ONLY!
+
+const database = process.env.MONGO_URI;
+mongoose
+  .connect(database, { useUnifiedTopology: true, useNewUrlParser: true })
+  .then(() => console.log("# Connected to MongoDB sucessfully"))
+  .catch((err) => console.log(err));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -38,7 +46,7 @@ app.use(function(req, res, next) {
 });
 
 //Start our server and tests!
-const listener = app.listen(process.env.PORT || 3000, function () {
+const listener = app.listen(process.env.PORT || 80, function () {
   console.log('Your app is listening on port ' + listener.address().port);
   if(process.env.NODE_ENV==='test') {
     console.log('Running Tests...');
